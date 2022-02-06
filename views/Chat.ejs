@@ -1,0 +1,513 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Gappa is a bootstrap minimal & clean admin template">
+    <meta name="keywords" content="chat, chat platform, discussion, video call, voice call, communication, conversation, messange, messanger, talk">
+    <meta name="author" content="Themesbox">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+    <title>Chat App</title>
+    <!-- Fevicon -->
+    <link rel="shortcut icon" href="assets/images/favicon.ico">
+    <!-- Start css -->
+    <!-- Slick css -->
+    <link href="assets/plugins/slick/slick.css" rel="stylesheet">
+    <link href="assets/plugins/slick/slick-theme.css" rel="stylesheet">
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/icons.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/flag-icon.min.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/style.css" rel="stylesheet" type="text/css">
+
+
+    <script src="/socket.io/socket.io.js"></script>
+
+    <!-- End css -->
+</head>
+<body class="light-layout">
+    <!-- Start Create Group Modal -->
+    <div class="modal create-group-modal fade" id="createUser" tabindex="-1" role="dialog" aria-labelledby="createGroupTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createGroupTitle">Invite a User</h5>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <input type="email" class="form-control" id="new_user_email" placeholder="Enter User Email">
+                        </div>
+                        
+                       
+                        <div class="mt-3 text-center">
+                            <button type="button" class="btn btn-primary" id="add_new_user"><i class="feather icon-plus mr-2"></i>Send a Link</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Incoming Video Call Modal --> <!-- Start Create Group Modal -->
+    <div class="modal create-group-modal fade" id="createGroup" tabindex="-1" role="dialog" aria-labelledby="createGroupTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createGroupTitle">Create Group</h5>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="groupName" placeholder="Enter Group Name">
+                        </div>
+                        <div class="form-group">
+                            <textarea class="form-control" name="groupDesc" id="groupDesc" rows="3" placeholder="Enter Group Description"></textarea>
+                        </div>
+                        <p class="create-group-header">Add Users</p>
+                        <div class="added-users">
+                            <div class="avatar-group">
+                                <div class="avatar">
+                                    <a href="#" data-toggle="tooltip" data-placement="top" title="" data-original-title="Emily Cook">
+                                        <img src="assets/images/girl.svg" alt="avatar" class="rounded-circle">
+                                    </a>
+                                </div>
+                                <div class="avatar">
+                                    <a href="#" data-toggle="tooltip" data-placement="top" title="" data-original-title="Lauren Gotlib">
+                                        <img src="assets/images/men.svg" alt="avatar" class="rounded-circle">
+                                    </a>
+                                </div>
+                                <div class="avatar">
+                                    <a href="#" data-toggle="tooltip" data-placement="top" title="" data-original-title="Noir Ajkeban">
+                                        <img src="assets/images/women.svg" alt="avatar" class="rounded-circle">
+                                    </a>
+                                </div>
+                                <div class="avatar">
+                                    <a href="#" data-toggle="tooltip" data-placement="top" title="" data-original-title="Add New User">
+                                        <img src="assets/images/plus.svg" alt="avatar" class="rounded-circle">
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="add-users-search">
+                            <div class="input-group">
+                                <input type="search" class="form-control" placeholder="Search" aria-label="Search" aria-describedby="add-users-search-btn">
+                                <div class="input-group-append">
+                                    <button class="btn" type="submit" id="add-users-search-btn"><i class="feather icon-search"></i></button>
+                                </div>
+                            </div>
+                        </div> 
+                        <div class="add-users-list">
+                            <ul class="list-unstyled">
+                                <li class="media">
+                                    <img class="align-self-center rounded-circle" src="assets/images/girl.svg" alt="Generic placeholder image">
+                                    <div class="media-body">
+                                        <h5><span>Emily Cook</span></h5>
+                                        <p>Hey there. I am on Chalty.</p>
+                                    </div>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="userfirstAdd" checked>
+                                        <label class="custom-control-label" for="userfirstAdd"></label>
+                                    </div>
+                                </li>
+                                <li class="media">
+                                    <img class="align-self-center rounded-circle" src="assets/images/boy.svg" alt="Generic placeholder image">
+                                    <div class="media-body">
+                                        <h5>James Simeron</h5>
+                                        <p>Work mode ON !!</p>
+                                    </div>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="usersecondAdd">
+                                        <label class="custom-control-label" for="usersecondAdd"></label>
+                                    </div>
+                                </li>
+                                <li class="media">
+                                    <img class="align-self-center rounded-circle" src="assets/images/men.svg" alt="Generic placeholder image">
+                                    <div class="media-body">
+                                        <h5>Lauren Gotlib</h5>
+                                        <p>Let's go hiking.</p>
+                                    </div>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="userthirdAdd" checked>
+                                        <label class="custom-control-label" for="userthirdAdd"></label>
+                                    </div>
+                                </li>
+                                <li class="media">
+                                    <img class="align-self-center rounded-circle" src="assets/images/girl.svg" alt="Generic placeholder image">
+                                    <div class="media-body">
+                                        <h5>Nebraska Oshivo</h5>
+                                        <p>Why so serious ?</p>
+                                    </div>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="userfourthAdd">
+                                        <label class="custom-control-label" for="userfourthAdd"></label>
+                                    </div>
+                                </li>
+                                <li class="media">
+                                    <img class="align-self-center rounded-circle" src="assets/images/women.svg" alt="Generic placeholder image">
+                                    <div class="media-body">
+                                        <h5>Noir Ajkeban</h5>
+                                        <p> ** No Status **</p>
+                                    </div>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="userfifthAdd" checked>
+                                        <label class="custom-control-label" for="userfifthAdd"></label>
+                                    </div>
+                                </li>  
+                                <li class="media">
+                                    <img class="align-self-center rounded-circle" src="assets/images/boy.svg" alt="Generic placeholder image">
+                                    <div class="media-body">
+                                        <h5><span>John Smith</span></h5>
+                                        <p>Hey there. I am on Chalty.</p>
+                                    </div>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="userSixthAdd" checked>
+                                        <label class="custom-control-label" for="userSixthAdd"></label>
+                                    </div>
+                                </li>
+                                <li class="media">
+                                    <img class="align-self-center rounded-circle" src="assets/images/girl.svg" alt="Generic placeholder image">
+                                    <div class="media-body">
+                                        <h5>Arya Thompson</h5>
+                                        <p>Work mode ON !!</p>
+                                    </div>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="userSeventhdAdd">
+                                        <label class="custom-control-label" for="userSeventhdAdd"></label>
+                                    </div>
+                                </li>
+                                <li class="media">
+                                    <img class="align-self-center rounded-circle" src="assets/images/men.svg" alt="Generic placeholder image">
+                                    <div class="media-body">
+                                        <h5>Mike Wright</h5>
+                                        <p>Let's go hiking.</p>
+                                    </div>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="userEightAdd">
+                                        <label class="custom-control-label" for="userEightAdd"></label>
+                                    </div>
+                                </li>
+                                <li class="media">
+                                    <img class="align-self-center rounded-circle" src="assets/images/boy.svg" alt="Generic placeholder image">
+                                    <div class="media-body">
+                                        <h5>Robert Pattinson</h5>
+                                        <p>Why so serious ?</p>
+                                    </div>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="userNinthAdd">
+                                        <label class="custom-control-label" for="userNinthAdd"></label>
+                                    </div>
+                                </li>
+                                <li class="media">
+                                    <img class="align-self-center rounded-circle" src="assets/images/women.svg" alt="Generic placeholder image">
+                                    <div class="media-body">
+                                        <h5>Seema Rao</h5>
+                                        <p> ** No Status **</p>
+                                    </div>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="userTenthAdd">
+                                        <label class="custom-control-label" for="userTenthAdd"></label>
+                                    </div>
+                                </li>         
+                                <li class="media">
+                                    <img class="align-self-center rounded-circle" src="assets/images/girl.svg" alt="Generic placeholder image">
+                                    <div class="media-body">
+                                        <h5>Noir Williamson</h5>
+                                        <p> ** No Status **</p>
+                                    </div>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="userEleventhAdd">
+                                        <label class="custom-control-label" for="userEleventhAdd"></label>
+                                    </div>
+                                </li>                                   
+                            </ul>
+                        </div>
+                        <div class="mt-3 text-center">
+                            <button type="submit" class="btn btn-primary"><i class="feather icon-plus mr-2"></i>Create Group</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Incoming Video Call Modal -->
+    <!-- Start Incoming Video Call Modal -->
+    <div class="modal incoming-video-modal fade" id="incomingVideoCall" tabindex="-1" role="dialog" aria-labelledby="incomingVideoCallTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-white" id="incomingVideoCallTitle">Incoming Video Call</h5>
+                </div>
+                <div class="modal-body">
+                    <img src="assets/images/girl.svg" alt="avatar" class="rounded-circle">
+                    <h5 class="text-white">Jessica Meir</h5>
+                    <p class="text-white">Texas, USA</p>
+                    <button type="button" class="btn btn-success mr-3"><i class="feather icon-check mr-2"></i>Accept</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="feather icon-x mr-2"></i>Reject</button>                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Incoming Video Call Modal -->
+    <!-- Start Incoming Voice Call Modal -->
+    <div class="modal incoming-voice-modal fade" id="incomingVoiceCall" tabindex="-1" role="dialog" aria-labelledby="incomingVoiceCallTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="incomingVoiceCallTitle">Incoming Voice Call</h5>
+                </div>
+                <div class="modal-body">
+                    <img src="assets/images/men.svg" alt="avatar" class="rounded-circle">
+                    <h5>Jessica Meir</h5>
+                    <p>Texas, USA</p>
+                    <button type="button" class="btn btn-success mr-3"><i class="feather icon-check mr-2"></i>Accept</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="feather icon-x mr-2"></i>Reject</button>                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Incoming Voice Call Modal -->
+    <!-- Start Error Screen Modal -->
+    <div class="modal error-screen-modal fade" id="errorScreen" tabindex="-1" role="dialog" aria-labelledby="errorScreenTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="errorScreenTitle">Connection Error</h5>
+                </div>
+                <div class="modal-body">
+                    <img src="assets/images/connection_error.svg" class="img-fluid" alt="connection_error">
+                    <h5>Computer not Connected</h5>
+                    <p>Please, check internet connection this PC.</p>
+                    <button type="button" class="btn btn-info"><i class="feather icon-repeat mr-2"></i>Try Again</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Incoming Voice Call Modal -->
+    <!-- Start Chat Layout -->
+    <div class="chat-layout">
+        <!-- Start Chat Leftbar -->
+        <div class="chat-leftbar">
+            <div class="tab-content" id="pills-tab-justifiedContent">
+                <!-- Start Chat Listbar -->
+                <div class="tab-pane fade show active" id="pills-chat-justified" role="tabpanel" aria-labelledby="pills-chat-tab-justified">
+                    <div class="chat-listbar">
+                        <div class="chat-left-headbar">
+                            <div class="row align-items-center">
+                                <div class="col-9">
+                                    <ul class="list-unstyled mb-0">
+                                        <li class="media">
+                                            <img class="align-self-center mr-2" src="assets/images/logo.svg" alt="Generic placeholder image">
+                                            <div class="media-body">
+                                                <h5 class="mb-0 mt-2" id="loggin_user"></h5>
+                                                <!-- <h5 class="mb-0 mt-2">Chat</h5> -->
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-3">
+                                    <a href="/logout" data-toggle="tooltip" data-placement="right" title="Logout"><i class="feather icon-log-out"></i></a>
+                                </div>
+                            </div>
+                        </div>  
+                        <div class="chat-left-search">
+                            <form>
+                                <div class="input-group">
+                                  <input type="search" class="form-control" placeholder="Search" aria-label="Search" aria-describedby="chat-left-search-btn">
+                                  <div class="input-group-append">
+                                    <button class="btn" type="submit" id="chat-left-search-btn"><i class="feather icon-search"></i></button>
+                                  </div>
+                                </div>
+                            </form>
+                        </div>                                     
+                        <div class="chat-left-body">       
+                           <%- include('include/left_bar.ejs') %>
+                        </div>                                       
+                    </div>                                    
+                </div>
+                <!-- End Chat Listbar -->
+                <!-- Start Chat Addbar -->
+                <div class="tab-pane fade" id="pills-addchat-justified" role="tabpanel" aria-labelledby="pills-addchat-tab-justified">
+                                              <%- include('include/new_chat.ejs') %>
+                </div>
+                <!-- End Chat Addbar -->
+                <!-- Start Chat Profilebar -->
+                <div class="tab-pane fade" id="pills-profile-justified" role="tabpanel" aria-labelledby="pills-profile-tab-justified">
+                    <%- include('include/logger_profile.ejs') %>
+                </div>
+                <!-- End Chat Profilebar -->
+                <!-- Start Chat Settingbar -->
+                <div class="tab-pane fade" id="pills-setting-justified" role="tabpanel" aria-labelledby="pills-setting-tab-justified">
+                    <div class="chat-settingbar">
+                        <div class="chat-left-headbar">
+                            <div class="row align-items-center">
+                                <div class="col-9">                                                
+                                    <ul class="list-unstyled mb-0">
+                                        <li class="media">
+                                            <img class="align-self-center mr-2" src="assets/images/logo.svg" alt="Generic placeholder image">
+                                            <div class="media-body">
+                                                <h5 class="mb-0 mt-2">Setting</h5>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-3">
+                                    <div class="dropdown">
+                                        <a href="#" id="settingDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="feather icon-more-vertical-"></i></a>
+                                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="settingDropdown">
+                                            <a class="dropdown-item font-14" href="#">Reset to Defaults</a>
+                                            <a class="dropdown-item font-14" href="#">Backup</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chat-left-body">
+                            <p class="setting-header">General Settings</p>
+                            <div class="general-setting">
+                                <div class="row align-items-center pb-3">
+                                    <div class="col-9"><h6 class="mb-0">Notification Sounds</h6></div>
+                                    <div class="col-3 text-right">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="notificationSound" checked>
+                                            <label class="custom-control-label" for="notificationSound"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row align-items-center pb-3">
+                                    <div class="col-9"><h6 class="mb-0">New Message Alerts</h6></div>
+                                    <div class="col-3 text-right">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="newMessageAlerts">
+                                            <label class="custom-control-label" for="newMessageAlerts"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row align-items-center pb-3">
+                                    <div class="col-9"><h6 class="mb-0">Show Mini Messages in Sidebar</h6></div>
+                                    <div class="col-3 text-right">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="showMiniMessages">
+                                            <label class="custom-control-label" for="showMiniMessages"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="setting-header">Privacy Settings</p>
+                            <div class="privacy-setting">                                                
+                                <div class="row align-items-center pb-3">
+                                    <div class="col-9"><h6 class="mb-0">Read Receipts</h6></div>
+                                    <div class="col-3 text-right">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" id="readReceipts" checked>
+                                            <label class="custom-control-label" for="readReceipts"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row align-items-center pb-3">
+                                    <div class="col-9"><h6 class="mb-0">Show Profile Picture</h6></div>
+                                    <div class="col-3 text-right">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" id="showProfilePicture">
+                                            <label class="custom-control-label" for="showProfilePicture"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row align-items-center pb-3">
+                                    <div class="col-9"><h6 class="mb-0">Allow Messages from Strangers</h6></div>
+                                    <div class="col-3 text-right">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" id="allowMessageToStrangers">
+                                            <label class="custom-control-label" for="allowMessageToStrangers"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="setting-header">Design Settings</p>
+                            <div class="design-setting custom-checkbox-button">
+                                <div class="form-check-inline checkbox-primary">
+                                  <input type="checkbox" id="customCheckboxInline5" name="customCheckboxInline2" checked>
+                                  <label for="customCheckboxInline5"></label>
+                                </div>
+                                <div class="form-check-inline checkbox-secondary">
+                                  <input type="checkbox" id="customCheckboxInline6" name="customCheckboxInline2">
+                                  <label for="customCheckboxInline6"></label>
+                                </div>
+                                <div class="form-check-inline checkbox-success">
+                                  <input type="checkbox" id="customCheckboxInline7" name="customCheckboxInline2">
+                                  <label for="customCheckboxInline7"></label>
+                                </div>
+                                <div class="form-check-inline checkbox-danger">
+                                  <input type="checkbox" id="customCheckboxInline8" name="customCheckboxInline2">
+                                  <label for="customCheckboxInline8"></label>
+                                </div>
+                                <div class="form-check-inline checkbox-warning">
+                                  <input type="checkbox" id="customCheckboxInline9" name="customCheckboxInline2">
+                                  <label for="customCheckboxInline9"></label>
+                                </div>
+                                <div class="form-check-inline checkbox-info">
+                                  <input type="checkbox" id="customCheckboxInline10" name="customCheckboxInline2">
+                                  <label for="customCheckboxInline10"></label>
+                                </div>
+                                <div class="form-check-inline checkbox-light">
+                                  <input type="checkbox" id="customCheckboxInline11" name="customCheckboxInline2">
+                                  <label for="customCheckboxInline11"></label>
+                                </div>
+                                <div class="form-check-inline checkbox-dark">
+                                  <input type="checkbox" id="customCheckboxInline12" name="customCheckboxInline2">
+                                  <label for="customCheckboxInline12"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Chat Settingbar -->
+            </div>
+            <div class="chat-menu">
+                <ul class="nav nav-pills nav-justified mb-0" id="pills-tab-justified" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="pills-chat-tab-justified" data-toggle="pill" href="#pills-chat-justified" role="tab" aria-controls="pills-chat-justified" aria-selected="true"><i class="feather icon-message-circle"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="pills-addchat-tab-justified" data-toggle="pill" href="#pills-addchat-justified" role="tab" aria-controls="pills-addchat-justified" aria-selected="false"><i class="feather icon-edit-1"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="pills-profile-tab-justified" data-toggle="pill" href="#pills-profile-justified" role="tab" aria-controls="pills-profile-justified" aria-selected="false"><i class="feather icon-user"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="pills-setting-tab-justified" data-toggle="pill" href="#pills-setting-justified" role="tab" aria-controls="pills-setting-justified" aria-selected="false"><i class="feather icon-settings"></i></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!-- End Chat Leftbar -->
+        <!-- Start Chat Rightbar -->  
+        <div class="chat-rightbar">
+            <!-- Start Chat Detail -->
+           
+                    <%- include('include/chat_body.ejs') %>                   
+                
+            <!-- End Chat Detail -->
+           
+        </div>
+        <!-- End Chat Rightbar -->
+    </div>
+    <!-- End Chat Layout -->
+    <!-- Start js -->        
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/popper.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/modernizr.min.js"></script>
+    <script src="assets/js/detect.js"></script>
+    <script src="assets/js/jquery.slimscroll.js"></script>
+    <script src="assets/js/vertical-menu.js"></script>
+    <!-- Slick js -->
+    <script src="assets/plugins/slick/slick.min.js"></script>
+    <!-- Core js -->
+    <script src="assets/js/core.js"></script>
+    <script src="assets/js/custom.js"></script>
+    <script src="assets/apis/chat.js" defer></script>
+
+
+    <!-- End js -->
+</body>
+</html>

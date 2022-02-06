@@ -1,0 +1,47 @@
+    
+.preloader{
+    position: absolute;
+    top: 25%;
+    left:35%;
+    width: 30%;
+    height: auto;
+    background-color: #ffffff;
+    border-radius: 10px;
+    border: 2px solid #ddd;
+    text-align: center;
+    padding: 20px;
+    box-shadow: 0 4px 8px 0 rgba(78, 172, 109, 0.2), 0 6px 20px 0 rgba(78, 172, 109, 0.19);
+    z-index: 10;
+    font-family: var(--bs-body-font-family);
+    display: none;
+}
+
+.preloader .success_gif{
+    width: 70%;
+    height: auto;
+}
+
+.preloader .failure_gif{
+    width: 25%;
+    height: auto;
+}
+
+.user_settings{
+    position: absolute;
+    right: 23px;
+    top: 57px;
+    width: 93px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%);
+    border-radius: 3px;
+    text-align: left!important;
+    z-index: 20;
+    display: none;
+}
+
+.user_settings ul{
+    list-style-type: none;
+    text-align: center;
+    margin-left: 0!important;
+    padding-left: 0px!important; margin-top: revert!important;
+}

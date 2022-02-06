@@ -1,0 +1,123 @@
+<div class="chat-profilebar">
+
+    <div class="profile_update_status">
+        <span>Hello world</span>
+        <i class="feather icon-x align-self-center"></i>
+    </div>
+    <div class="chat-left-headbar">
+        <div class="row align-items-center">
+            <div class="col-12">                                                
+                <ul class="list-unstyled mb-0">
+                    <li class="media">
+                        <img class="align-self-center mr-2" src="assets/images/logo.svg" alt="Generic placeholder image">
+                        <div class="media-body">
+                            <h5 class="mb-0 mt-2">My Profile</h5>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="chat-left-body">
+
+<!-- 
+        <form id="uploadForm" enctype="multipart/form-data" action="/photo"  method="post">
+          <input type="file" name="userPhoto" id="userPhoto" />
+          <input type="button" value="Upload Image" id="upload_photo" name="submit">
+          <span id="status"></span>
+      </form> -->
+
+      <div class="profilebar">
+        <img class="profile-pic img-fluid" src="assets/images/men.svg" alt="profile-pic">  
+        <div class="profile-edit">
+            <i class="feather icon-camera upload-button"></i>
+            <input class="profile-upload" type="file" id="userPhoto" accept="image/*"/>
+        </div>  
+        <h5></h5>
+        <p class="mb-0 country"></p>                                            
+    </div> 
+    <div class="profile-detail">
+        <ul class="list-unstyled mb-0">
+            <li class="media">
+                <i class="feather icon-user align-self-center"></i>
+                <div class="media-body" id="updateUsername">
+                    <p>Username</p>
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="username" id="edit_username" value="Will Patinson" aria-label="Will Patinson" aria-describedby="button-addon-group-username">
+                        <div class="input-group-append">
+                            <button class="btn btn-link" type="button" id="button-addon-group-username" title="Edit username"><i class="feather icon-edit-2 align-self-center"></i></button>
+                        </div>
+                    </div>
+                    <p id="usernameError"></p>
+                </div>
+            </li>  
+            <li class="media">
+                <i class="feather icon-phone align-self-center"></i>
+                <div class="media-body" id="updateMobile">
+                    <p>Mobile</p>
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="mobile" id="edit_mobile" value="" aria-label="" aria-describedby="button-addon-group-location">
+                        <div class="input-group-append">
+                            <button class="btn btn-link" type="button" id="button-addon-group-mobile" title="Edit Country"><i class="feather icon-edit-2 align-self-center"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </li>  
+            <li class="media">
+                <i class="feather icon-map align-self-center"></i>
+                <div class="media-body" id="updateLocation">
+                    <p>Country</p>
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="country" id="edit_country" value="" aria-label="" aria-describedby="button-addon-group-location">
+                        <div class="input-group-append">
+                            <button class="btn btn-link" type="button" id="button-addon-group-location" title="Edit Country"><i class="feather icon-edit-2 align-self-center"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </li>  
+            <li class="media">
+                <i class="feather icon-message-square align-self-center"></i>
+                <div class="media-body" id="updateStatus">
+                    <p>Status</p>
+                    <div class="input-group">
+                        <input type="text" class="form-control" email="status" id="edit_status" value="" aria-label="" aria-describedby="button-addon-group-status">
+                        <div class="input-group-append">
+                            <button class="btn btn-link" type="button" id="button-addon-group-status" title="Edit Status"><i class="feather icon-edit-2 align-self-center"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li class="media">
+                <i class="feather icon-mail align-self-center"></i>
+                <div class="media-body" id="updateEmail">
+                    <p>Email ID</p>
+                    <div class="input-group">
+                        <input type="email" class="form-control" name="email" value="" aria-label="demo@example.com" aria-describedby="button-addon-group-emailid" readonly>
+                        <div class="input-group-append">
+                            <!-- <button class="btn btn-link" type="button" id="button-addon-group-emailid">Update</button> -->
+                        </div>
+                    </div>
+                </div>
+            </li> 
+                                   <!--  <li class="media">
+                                        <i class="feather icon-lock align-self-center"></i>
+                                        <div class="media-body">
+                                            <p>Password</p>
+                                            <div class="input-group" id="updatePassword">
+                                                <input type="password" class="form-control" name="password" id="edit_password" value="" aria-label="********" aria-describedby="button-addon-group-password" placeholder="****">
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-link" type="button" id="button-addon-group-password" title="Change Password"><i class="feather icon-edit-2 align-self-center"></i></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li> -->
+                                    <li class="media" style="text-align: center;">
+
+                                        <div class="media-body">
+                                            <button type="button" class="update-profile"> Update </button>
+                                        </div>
+                                    </li>                                   
+                                </ul>
+                            </div>                                            
+                        </div>
+                    </div>
