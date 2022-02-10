@@ -25,6 +25,24 @@
 
     <!-- End css -->
 </head>
+
+<style type="text/css">
+    
+.mail_status{
+    color: #fff;
+    padding: 10px;
+    align-items: center;
+    text-align: center;
+    border-radius: 3px; 
+    display: none;   
+}
+
+.mail_status p{
+        margin-bottom: auto !important;
+}
+
+</style>
+
 <body class="light-layout">
     <!-- Start Create Group Modal -->
     <div class="modal create-group-modal fade" id="createUser" tabindex="-1" role="dialog" aria-labelledby="createGroupTitle" aria-hidden="true">
@@ -35,7 +53,11 @@
                 </div>
                 <div class="modal-body">
                     <form>
-                        <div class="form-group">
+                        <div class="form-group mail_status">
+                            <p> Hello </p>
+                        </div>
+
+                         <div class="form-group">
                             <input type="email" class="form-control" id="new_user_email" placeholder="Enter User Email">
                         </div>
                         

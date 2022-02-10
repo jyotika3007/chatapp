@@ -549,6 +549,17 @@ $(document).on('click','#add_new_user', function(){
 		url: '/send-invitation-link',
 		success:function(data){
 			console.log(data)
+
+			$('.mail_status').show();
+
+			if(data.status == 200){
+				$('.mail_status').addClass('success');
+			}
+			else{
+				$('.mail_status').addClass('failure');
+			}
+				$('.mail_status p').text(data.response);
+
 		}
 	})
 

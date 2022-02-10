@@ -246,8 +246,8 @@ app.post('/verify-mail',jsonParser, async function(req,res){
 		to: req.body.email,
 		subject: 'Account Verification',
 		html: `Hi User, you are successfully registerd to <a href="http://localhost:4400">Chat App</a>.<br/>
-		Click the below link to verify your email:<br>/
-		<a href="http://localhost:4400/verify_account?uid=${enc_email}">http://localhost:4400/verify_your_account</a>`
+		Click the below link to verify your email:<br>
+		<a target="blank" href="http://localhost:4400/verify_account?uid=${enc_email}">http://localhost:4400/verify_your_account</a>`
 	}
 
 	transport.sendMail(mailOptions,function(error, info){
@@ -290,8 +290,8 @@ app.post('/send-invitation-link',jsonParser, async function(req,res){
 		from: 'Hello Riya',
 		to: req.body.email,
 		subject: 'Invitaion Link',
-		html: `Hi User, ${req.body.logger_email} has sent you an invitaion link for Chat App. Click the below link to get connected with us:<br>/
-		<a href="http://localhost:4400/activate_account?uid=${req.body.logger_id}&uem=${enc_email}">http://localhost:4400/activate_account</a>`
+		html: `Hi User, ${req.body.logger_email} has sent you an invitaion link for Chat App. Click the below link to get connected with us:<br>
+		<a target="blank" href="http://localhost:4400/activate_account?uid=${req.body.logger_id}&uem=${enc_email}">http://localhost:4400/activate_account</a>`
 	}
 
 	transport.sendMail(mailOptions,function(error, info){
@@ -306,7 +306,7 @@ app.post('/send-invitation-link',jsonParser, async function(req,res){
 		else{
 			res.status(200).json({
 				"status": 200,
-				"response": "Email sent successfully",
+				"response": "Invitation link successfully send to this email id",
 			})
 		}
 	})
@@ -314,7 +314,14 @@ app.post('/send-invitation-link',jsonParser, async function(req,res){
 });
 
 app.get('/activate_account',function(req,res){
-	
+
+	// res.end("Hello World");
+
+	let decipher = crypto.createDecipher(algo,key);
+		let decryptedEmail = decipher.update(req.query.uem,"hex","utf8") + decipher.final("utf8");
+
+	res.render('Activate_Account',{ email: decryptedEmail, uid: req.query.uid});
+
 })
 
 app.post('/user-profile',jsonParser, async function(req,res){
