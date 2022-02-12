@@ -9,6 +9,7 @@ let userSchema = new mongoose.Schema({
 	registration_date: String,
 	is_verify: Boolean,
 	contacts: Array,
+	chat_groups: Array,
 	is_active: String,
 	profile: String,
 	status: String,
@@ -16,15 +17,6 @@ let userSchema = new mongoose.Schema({
 	country: String,
 	createdAt: { type: Date, default: Date.now },
 	updatedAt: { type: Date, default: Date.now }
-	
-	// _id: mongoose.Schema.Types.ObjectId,
-	// username: { type: String, default: null },
-	// email: { type: String, unique: true },
-	// password: { type: String },
-	// registration_date: { type: String },
-	// token: { type: String },
-	// is_verify: { type: Boolean },
-
 });
 
 module.exports = mongoose.model('users',userSchema);

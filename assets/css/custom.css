@@ -11,7 +11,7 @@
     text-align: center;
     padding: 20px;
     box-shadow: 0 4px 8px 0 rgba(78, 172, 109, 0.2), 0 6px 20px 0 rgba(78, 172, 109, 0.19);
-    z-index: 10;
+    z-index: 1111;
     font-family: var(--bs-body-font-family);
     display: none;
 }

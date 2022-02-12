@@ -15,6 +15,21 @@ socket.on("connect",()=>{
 	console.log("Socket connected");
 })
 
+ $(document).ready(function(){
+
+            console.log(logger_id, 'Checking logging user')
+            if(logger_id==null || logger_id == 'null' || logger_id===undefined){
+
+                window.location.href = '/login'
+            }
+        })
+
+ $('.logout').on('click', function(){
+            localStorage.clear();
+ })
+
+
+
 
 
 
@@ -27,13 +42,9 @@ function get_user_profile(uid){
 
 		success:function(data){
 
-
-			// console.log(data)
-
 			u_detail = data.data;
 
-			return data;
-			
+			return data;		
 			
 		}
 
@@ -83,6 +94,7 @@ function getUsersList(){
 		success:function(data){
 
 			show_data_for_new_chat(data.users);
+			show_data_for_group_chat(data.users);
 
 			users = data.users;
 			channels = data.channels;
@@ -110,9 +122,7 @@ function getUsersList(){
 				</div>
 				</div>
 				</a>`
-
 			});
-
 
 			$('#chat-list-tab').empty();
 
@@ -121,23 +131,49 @@ function getUsersList(){
 			$('.chat-list-tab-'+logger_id).html(result);
 
 
-
-
-
+			show_users_groups(data.channels)
 		}
 
 	});
 }
 
 
-function show_data_for_new_chat(data){
-
-	data.sort((a,b) => (a.username > b.username) ? 1 : ((b.username > a.username) ? -1 : 0))
-	console.log(data);
+function show_users_groups(channels){
 
 	result = '';
 
+			channels.forEach((channel,index)=>{
+				status = '';
+				img = "assets/images/girl.svg"
+				
 
+				result+= `<a class="nav-link" id="chat-${channel._id}" data-name="${channel.group_name}" data-id="${channel._id}" data-toggle="pill" href="#chat-second" role="tab" aria-controls="chat-second" aria-selected="true">
+				<div class="media ">
+				<div class="channel-status ${status}"></div>
+				<img class="align-self-center rounded-circle" src="${img}" alt="channel Image">
+				<div class="media-body">
+				<h5>${channel.group_name}<span class="chat-timing"></span></h5>
+				<p class="last_chat"></p>
+				</div>
+				</div>
+				</a>`
+			});
+
+			$('#chat-group-tab').empty();
+
+			$('#chat-group-tab').addClass('chat-group-tab-'+logger_id);
+
+			$('.chat-group-tab-'+logger_id).html(result);
+
+
+}
+
+
+function show_data_for_new_chat(data){
+	// console.log(data);
+	data.sort((a,b) => (a.username > b.username) ? 1 : ((b.username > a.username) ? -1 : 0))	
+
+	result = '';
 	data.forEach((user,index)=>{
 		status = '';
 		img = "assets/images/girl.svg"
@@ -163,11 +199,41 @@ function show_data_for_new_chat(data){
 	});
 
 	$('#new-chat-tab').empty()
-
-
 	$('#new-chat-tab').addClass('new-chat-tab-'+logger_id);
-
 	$('.new-chat-tab-'+logger_id).html(result);
+}
+
+function show_data_for_group_chat(data){
+	result = '<ul class="list-unstyled">';
+
+data.forEach((user,index)=>{
+		status = '';
+		img = "assets/images/girl.svg"
+		if(user.is_active == 'offline'){
+			status = 'offline'
+		}
+
+		if(user.profile !== undefined && user.profile != ""){
+			img = '/public/uploads/'+user.profile
+		}
+
+	result+= `<li class="media li-${user._id}">
+                                    <img class="align-self-center rounded-circle" src="${img}" alt="Generic placeholder image">
+                                    <div class="media-body">
+                                        <h5><span>${user.username}</span></h5>
+                                        <p>${user.status}</p>
+                                    </div>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" value="${user._id}" name="selected_users[]" id="check-${user._id}" >
+                                        <label class="custom-control-label" for="check-${user._id}"></label>
+                                    </div>
+                                </li>`
+})
+
+result+='</ul>'
+
+	$('.add-users-list').empty();
+	$('.add-users-list').html(result);
 
 
 }
@@ -253,6 +319,7 @@ $(document).on('click','#button-addonsend', function(){
 	new_chat_id = data.from_id+'-'+data.to_id;
 
 	show_latest_chat('right',data,new_chat_id, div_id, logger_id);
+	$(".chat-messagebar input").val('');
 
 	socket.emit("send_message",data);
 
@@ -306,8 +373,6 @@ function show_users_chat(){
 				<span class="badge badge-secondary-inverse">Today</span>
 				</div> `;
 				chats.forEach((chat,index)=>{
-
-				// div_id = crypto.randomBytes(20).toString('hex');
 
 				div_id = "_"+randStr(32)
 
@@ -369,13 +434,10 @@ socket.on("new_message",(data)=>{
 	new_chat_id = data.to_id+'-'+data.from_id;
 	chatter_div_id = data.to_id;
 
-	if(data.from_id == logger_id){
-		align = 'right'
-		new_chat_id = data.from_id+'-'+data.to_id;						
-		chatter_div_id = data.from_id;
-	}
-
+	if(data.from_id != logger_id){
 	show_latest_chat(align,data,new_chat_id, div_id, chatter_div_id);
+	new Audio('/assets/notify/Notification.mp3').play();
+}
 
 })
 
@@ -562,5 +624,82 @@ $(document).on('click','#add_new_user', function(){
 
 		}
 	})
+
+})
+
+
+
+$(document).on('keyup','.seacrhUsers', function(){
+	let search_term = $(this).val()
+	search_term = search_term.toLowerCase()
+	console.log(search_term)
+
+  document.querySelectorAll('.selectable').forEach(
+    function(name) {
+      let item = name.firstChild.textContent;
+      if (item.toLowerCase().indexOf(text) != -1) {
+        name.style.display = 'block';
+      } else {
+        name.style.display = 'none';
+      }
+    })
+
+})
+
+$(document).on('click', '.create-group', function(){
+	let group_name = $('#groupName').val()
+	let group_desc = $('#groupDesc').val()
+	let selected_users = $('input[name="selected_users[]"]:checked').map(function(){
+		return $(this).val()
+	}).get();
+
+	console.log(group_name, group_desc, selected_users)
+
+	if(group_name == ''){	
+		$('.group_name_err').text('Please enter the group name')
+		return false;
+	}
+	else{
+		$('.group_name_err').text('')
+	}
+	if(selected_users.length==0){
+		$('.selected_users_err').text('Please select the user')		
+		return false;
+	}
+	else{
+		$('.selected_users_err').text('')
+	}
+
+	selected_users.push(logger_id)
+
+	$.ajax({
+		type: 'POST',
+		contentType: "application/json",
+		data: JSON.stringify({logger_id: logger_id, group_name: group_name, group_desc: group_desc, selected_users: selected_users}),
+		url: '/create-group',
+		success:function(data){
+				$('.preloader').show();
+			if(data.status == 200){
+				$('.preloader').empty();
+				$('.preloader').html(`<h3>${data.response}</h3>
+
+					<img src="assets/images/success.gif" class="success_gif" />`);
+				$('.preloader').show();
+				setTimeout(()=>{
+					window.location.href="/chat_box";
+				},3000)
+			}
+			else{
+				$('.preloader').html(`<h3>${data.response}</h3>
+					<img src="assets/images/failure.gif" class="failure_gif" />
+					<br>
+					<button class="btn btn-primary w-25" type="button" id="close_modal">OK</button>`);
+				$('.preloader').show();
+				
+			}
+		}
+	})
+
+
 
 })

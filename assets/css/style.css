@@ -28195,7 +28195,8 @@ mark {
   background-color: #f1f3f4;
   border-right: 2px solid #19a299;
 }
-.chat-leftbar .chat-left-body .chat-userlist .media .user-status {
+.chat-leftbar .chat-left-body .chat-userlist .media .user-status ,
+.chat-leftbar .chat-left-body .chat-grouplist .media .user-status {
   position: relative;
   left: 0;
   width: 12px;
@@ -28204,28 +28205,35 @@ mark {
   border: 2px solid #ffffff;
   background-color: #19a299;
 }
-.chat-leftbar .chat-left-body .chat-userlist .media .user-status.status-offline {
+.chat-leftbar .chat-left-body .chat-userlist .media .user-status.status-offline ,
+.chat-leftbar .chat-left-body .chat-grouplist .media .user-status.status-offline {
   background-color: #f0c740;
 }
-.chat-leftbar .chat-left-body .chat-userlist .media .user-status.status-away {
+.chat-leftbar .chat-left-body .chat-userlist .media .user-status.status-away ,
+.chat-leftbar .chat-left-body .chat-grouplist .media .user-status.status-away {
   background-color: #f27273;
 }
-.chat-leftbar .chat-left-body .chat-userlist .media .user-status ~ img {
+.chat-leftbar .chat-left-body .chat-userlist .media .user-status ~ img ,
+.chat-leftbar .chat-left-body .chat-grouplist .media .user-status ~ img {
   margin-left: -12px;
 }
-.chat-leftbar .chat-left-body .chat-userlist .media img {
+.chat-leftbar .chat-left-body .chat-userlist .media img ,
+.chat-leftbar .chat-left-body .chat-grouplist .media img {
   width: 40px;
   margin-right: 10px;
 }
-.chat-leftbar .chat-left-body .chat-userlist .media h5 {
+.chat-leftbar .chat-left-body .chat-userlist .media h5 ,
+.chat-leftbar .chat-left-body .chat-grouplist .media h5 {
   font-size: 15px;
   margin-bottom: 5px;
 }
-.chat-leftbar .chat-left-body .chat-userlist .media p {
+.chat-leftbar .chat-left-body .chat-userlist .media p ,
+.chat-leftbar .chat-left-body .chat-grouplist .media p {
   margin-bottom: 0;
   font-size: 14px;
 }
-.chat-leftbar .chat-left-body .chat-userlist .media .chat-timing {
+.chat-leftbar .chat-left-body .chat-userlist .media .chat-timing ,
+.chat-leftbar .chat-left-body .chat-grouplist .media .chat-timing {
   color: #8A98AC;
   float: right;
   font-size: 11px;
@@ -30183,7 +30191,7 @@ table.focus-on tfoot tr.focused td {
     text-transform:capitalize;
 }
 
-.chat-head .offline, #chat-list-tab .offline{
+.chat-head .offline, #chat-list-tab .offline #chat-group-tab .offline{
   background-color: #ed0808 !important;
 }
 
@@ -30235,4 +30243,10 @@ table.focus-on tfoot tr.focused td {
         .profile_update_status .feather:hover{
             border-radius: 3px;
             border: 1px solid #fff;
+        }
+
+        .err{
+          color: red !important;
+    font-size: 12px !important;
+    padding: 4px 12px !important;
         }

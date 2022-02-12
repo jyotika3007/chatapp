@@ -12,6 +12,7 @@ var io = require('socket.io')(http)
 const jwt = require('jsonwebtoken');
 const User = require('./models/users');
 const Chat = require('./models/chats');
+const ChatGroup = require('./models/chat_groups');
 const crypto = require('crypto');
 const sessions = require('express-session');
 
@@ -150,6 +151,10 @@ app.get('/register', function(req,res){
 
 app.post('/register',jsonParser, async function(req,res){
 
+	console.log('/////////////////////////////////////////////////////')
+	console.log(req.body)
+	console.log('/////////////////////////////////////////////////////')
+
 	let oldUser = User.findOne({"email": req.body.email}).then((result)=>{
 		if(result && result.is_verify == true){
 			res.status(200).json({
@@ -179,14 +184,44 @@ app.post('/register',jsonParser, async function(req,res){
 				country: 'India',
 				status: '',
 				contacts: [],
+				chat_groups: [],
 				is_active: 'offline',
 				is_verify: false
 			});
 
-			console.warn(data_save);
+			// console.warn(data_save);
+
 
 			data_save.save().then((result)=>{
 
+				console.log("New registered user's detail", result)
+
+				if(req.body.refferal_id !='' && req.body.refferal_id != null){
+					User.updateOne({_id: mongoose.Types.ObjectId(req.body.refferal_id)}, 
+					{ 
+						$push:{
+							contacts:{
+								uid: result._id,
+								is_blocked: false
+							}
+						}
+					}).then(rest1 => {
+						console.log(rest1, 'Add 1 refferal to contacts')
+						User.updateOne({_id: result._id}, 
+						{ 
+							$push:{
+								contacts:{
+									uid: mongoose.Types.ObjectId(req.body.refferal_id),
+									is_blocked: false
+								}
+							}
+						}).then(rest2 => {
+							console.log(rest2, 'Add 2 refferal to contacts')
+						}).catch(err2 => console.log(err2))
+					}).catch(err1 => console.log(err))
+
+					
+				}
 				jwt.sign({result},jwtkey,{expiresIn: '300s'},(err,token)=>{
 					if(!err){
 
@@ -315,12 +350,28 @@ app.post('/send-invitation-link',jsonParser, async function(req,res){
 
 app.get('/activate_account',function(req,res){
 
-	// res.end("Hello World");
+	data = req.query;
+
+
+	console.log(data)
 
 	let decipher = crypto.createDecipher(algo,key);
-		let decryptedEmail = decipher.update(req.query.uem,"hex","utf8") + decipher.final("utf8");
+	let decryptedEmail = decipher.update(req.query.uem,"hex","utf8") + decipher.final("utf8");
+	User.findOne({email : decryptedEmail}).then(result => {
+		console.log(result)
+		if(result!=null && result!='null' && result!=undefined){
+			console.log(result)
+			res.render('Chat');
+		}
+		else{
+			console.log("User Not found");
+			res.render('Activate_Account',{ email: decryptedEmail, uid: req.query.uid});
+		}
+	})
+	.catch(err => {
+		console.warn(err)
+	})
 
-	res.render('Activate_Account',{ email: decryptedEmail, uid: req.query.uid});
 
 })
 
@@ -342,9 +393,9 @@ app.post('/user-profile',jsonParser, async function(req,res){
 		}
 	}).catch(err => {
 		res.json({
-				status: 400,
-				response: "Bad Request"
-			})
+			status: 400,
+			response: "Bad Request"
+		})
 	})
 
 });
@@ -361,7 +412,7 @@ app.get('/verify_account', function(req,res){
 			User.updateOne({email: decryptedEmail}, {$set:{
 				is_verify: true
 			}}).then((rest)=>{
-				res.end("Update Successfully");
+				res.redirect('/email-verified')
 			}).catch((err)=>{
 				res.end("Error 1");
 			})	
@@ -375,119 +426,53 @@ app.get('/verify_account', function(req,res){
 });
 
 
-app.get('/users', function(req,res){
+app.get('/email-verified', function(req, res){
+	res.render('Email_Verified_PG')
+})
 
-	let favorites;
+
+app.get('/users', async function(req,res){
+
 	let users;
 	let channels;
-	let user_id;
+
+	let data = {};
 
 	user_id = req.query.uid
 
 	console.log(session)
+	let new_ids = [];
+	let new_group_ids = [];
 
-	let chat_users = User.findOne({_id: mongoose.Types.ObjectId(user_id)},{contacts: 1, _id: 0}).then(result => {
+	await User.findOne({_id: mongoose.Types.ObjectId(user_id)},{contacts: 1, chat_groups:1, _id: 0}).then(async (result) =>{
 		if(result){
-			let new_ids = [];
+
 			result.contacts.forEach((e) => {
-				new_ids.push(mongoose.Types.ObjectId(e))
+				new_ids.push(e.uid)
+			});						
+			console.log(new_ids, "New Users")
+
+			result.chat_groups.forEach((e) => {
+				new_group_ids.push(e)
 			});
-
-			User.find({ _id : { $in: new_ids } } , { username: 1, is_active: 1, profile: 1, status: 1 }).then(usr=>{
-				
-				channels = []
-
-				res.status(200).json({
-					users : usr,
-					channels : channels
-				});
-			})
-
+			console.log(new_group_ids, 'New Groups')
 		}
-	})
-
-})
-
-
-app.get('/callList', function(req,res){
-
-	let callList = [{
-		"_id": 1,
-		"username": "Patrick Hendricks",
-		"dateTime": "13 Aug, 2021, 01:05PM",
-		"profile": "assets/images/users/avatar-11.jpg",
-		"callTime":"02:34",
-		"callVideo" : true, 
-		"callTypeIcon":"bx bx-video align-middle",
-		"callArrowType":"ri-arrow-left-down-fill text-success align-bottom",
-		"mutipleUsercalls":false,
-		"multipleUsers":""
-
-	},
-	{
-		"_id": 2,
-		"username": "Steven Jury",
-		"dateTime": "13 Aug, 2021, 06:45PM",
-		"profile": "assets/images/users/avatar-7.jpg",
-		"callTime":"01:02",
-		"callVideo" : false,
-		"callTypeIcon":"bx bxs-phone-call align-middle",
-		"callArrowType":"ri-arrow-right-up-fill text-danger align-bottom",
-		"mutipleUsercalls":false,
-		"multipleUsers":""
-	},
-	{
-		"_id": 3,
-		"username": "Robert Ledonne",
-		"dateTime": "13 Aug, 2021, 04:30PM",
-		"profile": "",
-		"callTime":"01:40",
-		"callVideo" : true,
-		"callTypeIcon":"bx bx-video align-middle",
-		"callArrowType":"ri-arrow-left-down-fill text-success align-bottom",
-		"mutipleUsercalls":false,
-		"multipleUsers":""
-	}];
-
-	res.status(200).json({
-		callList : callList
-
 	});
 
+	await User.find({ _id : { $in: new_ids } } , { username: 1, is_active: 1, profile: 1, status: 1 }).then(usr=>{				
+		data.users = usr				
+	})
+
+	await ChatGroup.find({ _id : { $in: new_group_ids } } , { group_name: 1, group_description: 1 }).then(channels=>{		
+		data.channels = channels				
+	});
+
+
+
+	console.log(data)
+	res.status(200).json(data);
 })
 
-
-app.get('/contacts',function(req,res){
-
-	contacts = [{
-		"_id": 1,
-		"username": "Adam Zampa",
-		"is_active": "online",
-		"profile": "assets/images/users/avatar-1.jpg"
-	},
-	{
-		"_id": 2,
-		"username": "Bella Cote",
-		"is_active": "online",
-		"profile": "assets/images/users/avatar-2.jpg"
-	},
-	{
-		"_id": 3,
-		"username": "Floria Underhill",
-		"is_active": "online",
-		"profile": "assets/images/users/avatar-3.jpg"
-	},
-	{   "_id": 4,
-	"username": "Fidel Pinard",
-	"is_active": "Offline", 
-	"profile": "" 
-} ]
-
-res.status(200).json({
-	contacts : contacts
-
-});
-})	
 
 app.get('/chats',function(req,res){
 	logged_in_id = req.query.logger_id;
@@ -501,43 +486,43 @@ app.get('/chats',function(req,res){
 	let users_chat = Chat.findOne({ $or : [ {chat_id: chat_id_1}, {chat_id: chat_id_2} ] }, {chats: 1}).then(result => {
 
 		// console.log(result)
-if(result){
-		chats = result.chats;
-		cid = result._id
+		if(result){
+			chats = result.chats;
+			cid = result._id
 
-		User.findOne({_id: mongoose.Types.ObjectId(chatted_id)},{_id: 0, is_active: 1, profile: 1}).then(rest=>{
+			User.findOne({_id: mongoose.Types.ObjectId(chatted_id)},{_id: 0, is_active: 1, profile: 1}).then(rest=>{
 
-			if(rest){
+				if(rest){
 
-				res.status(200).json({
-					chats : chats,
-					cid: cid,
-					is_active: rest.is_active,
-					profile: rest.profile
+					res.status(200).json({
+						chats : chats,
+						cid: cid,
+						is_active: rest.is_active,
+						profile: rest.profile
 
-				});
-			}
-			else{
-				res.status(200).json({
-					chats : chats,
-					cid: cid,
-					is_active: "",
-					profile: ""
+					});
+				}
+				else{
+					res.status(200).json({
+						chats : chats,
+						cid: cid,
+						is_active: "",
+						profile: ""
 
-				});
-			}
+					});
+				}
 
-		})
-}
-else{
-	res.status(200).json({
-					chats : [],
-					
-					is_active: "",
-					profile: ""
+			})
+		}
+		else{
+			res.status(200).json({
+				chats : [],
 
-				});
-}
+				is_active: "",
+				profile: ""
+
+			});
+		}
 
 
 	})
@@ -555,9 +540,6 @@ app.get('/forgot_password', function(req,res){
 
 
 app.get('/logout', function(req,res){
-
-
-
 
 	req.session.destroy((err) => {
 		if(err) {
@@ -581,20 +563,20 @@ app.get('/update-profile', function(req,res){
 	data = req.query
 	// console.log(data);
 	
-		 User.updateOne({_id: mongoose.Types.ObjectId(data.logger_id)}, {$set: {
-		 	username: data.username,
-		 	country: data.country,
-		 	mobile: data.mobile,
-		 	status: data.status
-		 }}).then(result => {	
+	User.updateOne({_id: mongoose.Types.ObjectId(data.logger_id)}, {$set: {
+		username: data.username,
+		country: data.country,
+		mobile: data.mobile,
+		status: data.status
+	}}).then(result => {	
 
-		 	console.log("Getting result *****************************")
-		 	console.log(result)
-		 			res.status(200).json({
+		console.log("Getting result *****************************")
+		console.log(result)
+		res.status(200).json({
 			status: 200,
 			response: "Profile successfully updated."
 		})
-		 }).catch(err => {
+	}).catch(err => {
 		console.warn(err);
 		res.status(400).json({
 			status: 400,
@@ -607,21 +589,21 @@ app.get('/update-profile', function(req,res){
 
 app.post('/update-profile-pic', jsonParser, function(req,res){
 	// data = req.query
-data = req.body;
+	data = req.body;
 	file_data = req.file
 	console.log(data, file_data);
 	
-		 User.updateOne({_id: mongoose.Types.ObjectId(data.logger_id)}, {$set: {
-		 	profile: data.profile
-		 }}).then(result => {	
+	User.updateOne({_id: mongoose.Types.ObjectId(data.logger_id)}, {$set: {
+		profile: data.profile
+	}}).then(result => {	
 
-		 	console.log("Getting result *****************************")
-		 	console.log(result)
-		 			res.status(200).json({
+		console.log("Getting result *****************************")
+		console.log(result)
+		res.status(200).json({
 			status: 200,
 			response: "Profile successfully updated."
 		})
-		 }).catch(err => {
+	}).catch(err => {
 		console.warn(err);
 		res.status(400).json({
 			status: 400,
@@ -654,39 +636,39 @@ io.on('connection',function(socket){
 
 		let users_chat = Chat.findOne({_id: mongoose.Types.ObjectId(data.cid)}).then((result)=>{
 			console.log(typeof(result), " Got It ")
-		if(typeof(result) == "object" && result != null ){
+			if(typeof(result) == "object" && result != null ){
 
-			console.log("Inside IF Statement", result)
-			Chat.updateOne({
-				_id: mongoose.Types.ObjectId(data.cid)
-			},{
-				$push:{
-					chats:{
-						from_id: data.from_id,
-						to_id: data.to_id,
-						has_files: data.has_files,
-						has_images: data.has_images,
-						isReplied: data.isReplied,
-						datetime: data.datetime,
-						msg: data.msg
+				console.log("Inside IF Statement", result)
+				Chat.updateOne({
+					_id: mongoose.Types.ObjectId(data.cid)
+				},{
+					$push:{
+						chats:{
+							from_id: data.from_id,
+							to_id: data.to_id,
+							has_files: data.has_files,
+							has_images: data.has_images,
+							isReplied: data.isReplied,
+							datetime: data.datetime,
+							msg: data.msg
+						}
 					}
 				}
+				).then((rest)=>{
+					if(rest){
+						socket.to(iousers[data.to_id]).emit('new_message',{msg:data.msg, from_id: data.from_id, to_id: data.to_id, datetime: data.datetime});
+					}
+				}).catch((err)=>{
+					console.warn(err)
+				})
 			}
-			).then((rest)=>{
-				if(rest){
-					socket.to(iousers[data.to_id]).emit('new_message',{msg:data.msg, from_id: data.from_id, to_id: data.to_id, datetime: data.datetime});
-				}
-			}).catch((err)=>{
-				console.warn(err)
-			})
-		}
-		else{
-			console.log("Inside else Statement", result)
-			ch_id = data.from_id + "-" + data.to_id
-			let chat_data = new Chat({
-				_id: mongoose.Types.ObjectId(),
-				chat_id: ch_id,	
-				
+			else{
+				console.log("Inside else Statement", result)
+				ch_id = data.from_id + "-" + data.to_id
+				let chat_data = new Chat({
+					_id: mongoose.Types.ObjectId(),
+					chat_id: ch_id,	
+
 					chats:[{
 						from_id: data.from_id,
 						to_id: data.to_id,
@@ -696,17 +678,17 @@ io.on('connection',function(socket){
 						datetime: data.datetime,
 						msg: data.msg
 					}]				
-			});
+				});
 
-			chat_data.save().then((rest)=>{
-				if(rest){
-					io.emit("new_message", {msg:data.msg, from_id: data.from_id, to_id: data.to_id, datetime: data.datetime});
-				}
-			}).catch((err)=>{
-				console.warn(err)
-			})
+				chat_data.save().then((rest)=>{
+					if(rest){
+						io.emit("new_message", {msg:data.msg, from_id: data.from_id, to_id: data.to_id, datetime: data.datetime});
+					}
+				}).catch((err)=>{
+					console.warn(err)
+				})
 
-		}
+			}
 		}).catch((err)=>{
 			console.log(err) 			
 		});
@@ -722,40 +704,95 @@ io.on('connection',function(socket){
 
 app.post("/photo",  function(req, res)
 {
-    
+	console.log("Loger Id : " ,req.body)
+	if (!req.files) {
+		return res.status(400).send("No files were uploaded.");
+	}
 
-console.log("Loger Id : " ,req.body)
-    if (!req.files) {
-    return res.status(400).send("No files were uploaded.");
-  }
-
-  const file = req.files.userPhoto;
+	const file = req.files.userPhoto;
 
 
-  file_name = file.name
-  file_extension = file_name.split('.')[1];
-  new_file_name =  req.body.uid+'.'+file_extension
+	file_name = file.name
+	file_extension = file_name.split('.')[1];
+	new_file_name =  req.body.uid+'.'+file_extension
 
-  console.log(file_name,  " File Extension ///////////////")
-  const path = __dirname + "/public/uploads/" + new_file_name;
+	console.log(file_name,  " File Extension ///////////////")
+	const path = __dirname + "/public/uploads/" + new_file_name;
   // const path = __dirname + "/public/uploads/" + file.name;
 
   file.mv(path, (err) => {
-    if (err) {
-      return res.status(500).send(err);
-    }
+  	if (err) {
+  		return res.status(500).send(err);
+  	}
 
-    User.updateOne({_id: mongoose.Types.ObjectId(req.body.uid)} , { $set : {
-    	profile: new_file_name
-    }}).then(result => {
+  	User.updateOne({_id: mongoose.Types.ObjectId(req.body.uid)} , { $set : {
+  		profile: new_file_name
+  	}}).then(result => {
 
-    return res.send({ status: "200", response: "Profile Photo successfully uploaded.", path: new_file_name });
-    }).catch(err => {
+  		return res.send({ status: "200", response: "Profile Photo successfully uploaded.", path: new_file_name });
+  	}).catch(err => {
 
-    return res.send({ status: "400", response: "Something went wrong. Try again"});
-    })
+  		return res.send({ status: "400", response: "Something went wrong. Try again"});
+  	})
 
   });
 
 
 });
+
+
+app.post('/create-group', jsonParser,async function(req,res){
+	data = req.body
+
+	console.log(data);
+
+
+	var data_save = new ChatGroup({
+		_id: mongoose.Types.ObjectId(),
+		group_name: data.group_name,
+		group_description: data.group_desc,
+		contacts: data.selected_users,
+		chats: [],
+		createdBy: data.logger_id
+	});
+
+
+	data_save.save().then(async(result) => {
+
+		let users = data.selected_users;
+
+		users.forEach(async(item) => {
+
+			console.log(item, "Update User Chat Group Data")
+			await User.updateOne({_id: mongoose.Types.ObjectId(item)},
+			{
+				$push :{
+					chat_groups: result._id
+				}
+			}).then(rest => {
+				console.log(rest)
+			}).catch(err => {
+				res.json({ 
+					'status': 400,
+					'response': 'Bad Request',
+					'error': err
+				})
+			})
+		})
+		
+	}).catch(err => {
+		res.json({ 
+			'status': 200,
+			'response': 'Something went wrong. Try again',
+			'error': err
+		})
+	})
+
+	res.json({ 
+		'status': 200,
+		'response': ' Group successfully created',
+		'data': data_save
+	})
+
+
+})
